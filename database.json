@@ -1,0 +1,21 @@
+{
+    "users": [
+        {
+            "account_created_at": "2024-10-15 00:04:47",
+            "credits": 15162,
+            "name": "Debanjan Das",
+            "account_number": "4481294975718",
+            "password": "YnENu",
+            "age": 19,
+            "birth_date": "2005-08-06",
+            "phone_number": "917003213983",
+            "transaction_history": [
+                {
+                    "type": "withdraw",
+                    "amount": 1000.0,
+                    "date": "2024-10-15 00:09:25"
+                }
+            ]
+        }
+    ]
+}
