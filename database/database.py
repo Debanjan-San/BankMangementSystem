@@ -6,15 +6,15 @@ class Database:
     def __init__(self, db_path="database.json"):
         self.db_path = db_path
         if not os.path.exists(self.db_path):
-            with open(self.db_path, 'w') as f:
+            with open(self.db_path, "w") as f:
                 json.dump({}, f)  # Initialize with an empty dictionary
 
     def _load_db(self):
-        with open(self.db_path, 'r') as f:
+        with open(self.db_path, "r") as f:
             return json.load(f)
 
     def _save_db(self, db_content):
-        with open(self.db_path, 'w') as f:
+        with open(self.db_path, "w") as f:
             json.dump(db_content, f, indent=4)
 
     def find(self, collection_name, query={}):
@@ -24,7 +24,8 @@ class Database:
             return []
         # Case-insensitive search and matching logic
         return [
-            doc for doc in collection
+            doc
+            for doc in collection
             if all(str(doc.get(k)).lower() == str(v).lower() for k, v in query.items())
         ]
 
@@ -58,8 +59,11 @@ class Database:
     def delete_one(self, collection_name, query):
         db = self._load_db()
         collection = db.get(collection_name, [])
-        new_collection = [doc for doc in collection if not all(
-            doc.get(k) == v for k, v in query.items())]
+        new_collection = [
+            doc
+            for doc in collection
+            if not all(doc.get(k) == v for k, v in query.items())
+        ]
         if len(collection) != len(new_collection):
             db[collection_name] = new_collection
             self._save_db(db)

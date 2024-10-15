@@ -1,8 +1,10 @@
 import random
-from getpass import getpass
-from account_manager import AccountManager
-from colorama import Fore, Style, init
 import re
+from getpass import getpass
+
+from colorama import Fore, Style, init
+
+from account_manager import AccountManager
 
 # Initialize colorama
 init(autoreset=True)
@@ -14,8 +16,7 @@ class Menu:
 
     def display(self):
         while True:
-            print(Fore.CYAN + Style.BRIGHT +
-                  "\n=== Account Management System ===")
+            print(Fore.CYAN + Style.BRIGHT + "\n=== Account Management System ===")
             print(Fore.GREEN + "1. Create Account")
             print(Fore.GREEN + "2. Deposit Money")
             print(Fore.GREEN + "3. Withdraw Money")
@@ -30,23 +31,23 @@ class Menu:
             choice = input(Fore.YELLOW + "Enter your choice (1-9): ")
 
             match choice:
-                case '1':
+                case "1":
                     self.create_account()
-                case '2':
+                case "2":
                     self.deposit_money()
-                case '3':
+                case "3":
                     self.withdraw_money()
-                case '4':
+                case "4":
                     self.transfer_credits()
-                case '5':
+                case "5":
                     self.account_details()
-                case '6':
+                case "6":
                     self.show_transaction_history()
-                case '7':
+                case "7":
                     self.edit_account_details()
-                case '8':
+                case "8":
                     self.check_balance()
-                case '9':
+                case "9":
                     print(Fore.RED + "Exiting the system. Goodbye!")
                     break
                 case _:
@@ -74,23 +75,24 @@ class Menu:
             try:
                 name = input(Fore.YELLOW + "Enter your name: ")
                 age = int(input(Fore.YELLOW + "Enter your age: "))
-                birth_date = input(
-                    Fore.YELLOW + "Enter your birth date (YYYY-MM-DD): ")
+                birth_date = input(Fore.YELLOW + "Enter your birth date (YYYY-MM-DD): ")
                 if not self.validate_date(birth_date):
-                    raise ValueError(
-                        "Birth date must be in YYYY-MM-DD format.")
+                    raise ValueError("Birth date must be in YYYY-MM-DD format.")
                 phone_number = input(Fore.YELLOW + "Enter your phone number: ")
 
                 # Check for empty or invalid inputs
                 if not name or age <= 0 or not phone_number.isdigit():
-                    raise ValueError(
-                        "Invalid inputs. Please enter valid details.")
+                    raise ValueError("Invalid inputs. Please enter valid details.")
 
                 credits = random.randint(10000, 99999)
                 account = self.account_manager.create_account(
-                    name, age, birth_date, phone_number, credits)
-                print(Fore.GREEN + f"Account created successfully! \nAccount Number: {
-                      account['account_number']}\nPassword: {account['password']}")
+                    name, age, birth_date, phone_number, credits
+                )
+                print(
+                    Fore.GREEN
+                    + f"Account created successfully! \nAccount Number: {
+                      account['account_number']}\nPassword: {account['password']}"
+                )
                 return  # Exit after successful account creation
             except ValueError as ve:
                 print(Fore.RED + f"Error: {ve}")
@@ -106,7 +108,9 @@ class Menu:
         for attempt in range(2):
             password = getpass(
                 # Secure input
-                Fore.YELLOW + "Enter your password (5 characters): ")
+                Fore.YELLOW
+                + "Enter your password (5 characters): "
+            )
             if not self.validate_password(password):
                 print(Fore.RED + "Password must be a 5 character alphanumeric string.")
                 if attempt < 1:  # Only prompt again if this isn't the last attempt
@@ -119,8 +123,7 @@ class Menu:
 
     def verify_account(self):
         for attempt in range(2):
-            account_number = input(
-                Fore.YELLOW + "Enter account number (13 digits): ")
+            account_number = input(Fore.YELLOW + "Enter account number (13 digits): ")
 
             # Validate if account number is 13 digits long and exists
             if not self.validate_account_number(account_number):
@@ -128,8 +131,7 @@ class Menu:
                 if attempt < 1:  # Only prompt again if this isn't the last attempt
                     print(Fore.YELLOW + "Please try again.")
             elif not self.account_manager.check_account_number(account_number):
-                print(
-                    Fore.RED + f"Account number {account_number} does not exist.")
+                print(Fore.RED + f"Account number {account_number} does not exist.")
                 if attempt < 1:  # Only prompt again if this isn't the last attempt
                     print(Fore.YELLOW + "Please try again.")
             else:
@@ -183,7 +185,9 @@ class Menu:
 
             if amount > current_balance:
                 print(
-                    Fore.RED + f"Insufficient balance. Your current balance is {current_balance}")
+                    Fore.RED
+                    + f"Insufficient balance. Your current balance is {current_balance}"
+                )
                 return
 
             # Verify password
@@ -221,15 +225,18 @@ class Menu:
                 return
 
             # Check if sender has enough credits
-            sender_details = self.account_manager.account_details(
-                sender_account)
+            sender_details = self.account_manager.account_details(sender_account)
             if sender_details["credits"] < amount:
                 print(Fore.RED + "Insufficient credits. Transfer aborted.")
                 return
 
             # Perform the transfer if all checks pass
-            print(Fore.GREEN + self.account_manager.transfer_credits(sender_account,
-                  recipient_account, amount))
+            print(
+                Fore.GREEN
+                + self.account_manager.transfer_credits(
+                    sender_account, recipient_account, amount
+                )
+            )
             return  # Exit after successful transfer
 
         print(Fore.RED + "Too many invalid attempts. Returning to menu.")
@@ -246,8 +253,11 @@ class Menu:
         details = self.account_manager.account_details(account_number)
         if isinstance(details, dict):
             print(Fore.CYAN + Style.BRIGHT + "\n=== Account Details ===")
-            print(Fore.MAGENTA + f"Name: {details['name']}\nAge: {details['age']}\nBirth_date: {details['birth_date']}\nPhone_number: {
-                  details['phone_number']}\nCredits: {details['credits']}\nAccount_number: {details['account_number']}")
+            print(
+                Fore.MAGENTA
+                + f"Name: {details['name']}\nAge: {details['age']}\nBirth_date: {details['birth_date']}\nPhone_number: {
+                  details['phone_number']}\nCredits: {details['credits']}\nAccount_number: {details['account_number']}"
+            )
         else:
             print(Fore.RED + details)
         return  # Exit after displaying account details
@@ -261,16 +271,14 @@ class Menu:
         if not self.verify_password(account_number):
             print(Fore.RED + "Incorrect password. Operation denied.")
             return
-        transactions = self.account_manager.get_transaction_history(
-            account_number)
+        transactions = self.account_manager.get_transaction_history(account_number)
         if transactions:
             print(Fore.CYAN + Style.BRIGHT + "\n=== Transaction History ===")
             for trans in transactions:
-                trans_type = trans['type']
-                amount = trans['amount']
-                date = trans['date']
-                print(Fore.MAGENTA +
-                      f"{trans_type:<10} {amount:<10} {date:<20}")
+                trans_type = trans["type"]
+                amount = trans["amount"]
+                date = trans["date"]
+                print(Fore.MAGENTA + f"{trans_type:<10} {amount:<10} {date:<20}")
         else:
             print(Fore.RED + "No transactions found or account not found.")
         return
@@ -282,20 +290,32 @@ class Menu:
                 return
 
             new_details = {}
-            if input(Fore.YELLOW + "Do you want to edit the name? (y/n): ").lower() == 'y':
-                new_details['name'] = input(Fore.YELLOW + "Enter new name: ")
-            if input(Fore.YELLOW + "Do you want to edit the age? (y/n): ").lower() == 'y':
+            if (
+                input(Fore.YELLOW + "Do you want to edit the name? (y/n): ").lower()
+                == "y"
+            ):
+                new_details["name"] = input(Fore.YELLOW + "Enter new name: ")
+            if (
+                input(Fore.YELLOW + "Do you want to edit the age? (y/n): ").lower()
+                == "y"
+            ):
                 new_age = input(Fore.YELLOW + "Enter new age: ")
                 if new_age.isdigit() and int(new_age) > 0:
-                    new_details['age'] = int(new_age)
+                    new_details["age"] = int(new_age)
                 else:
                     if attempt < 1:
                         print(Fore.RED + "Invalid age input.")
                     continue
 
-            if input(Fore.YELLOW + "Do you want to edit the phone number? (y/n): ").lower() == 'y':
-                new_details['phone_number'] = input(
-                    Fore.YELLOW + "Enter new phone number: ")
+            if (
+                input(
+                    Fore.YELLOW + "Do you want to edit the phone number? (y/n): "
+                ).lower()
+                == "y"
+            ):
+                new_details["phone_number"] = input(
+                    Fore.YELLOW + "Enter new phone number: "
+                )
 
             # Verify password
             if not self.verify_password(account_number):
@@ -303,8 +323,7 @@ class Menu:
                 return
 
             # Update account details
-            self.account_manager.edit_account_details(
-                account_number, new_details)
+            self.account_manager.edit_account_details(account_number, new_details)
             print(Fore.GREEN + "Account details updated successfully.")
             return  # Exit after updating account details
 

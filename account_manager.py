@@ -1,13 +1,14 @@
-from database import Schema, Database, Model
-from datetime import datetime
 import random
 import string
+from datetime import datetime
+
+from database import Database, Model, Schema
 
 
 class AccountManager:
     def __init__(self):
         user_schema = Schema(
-            account_created_at=str,  # Date when account is created
+            account_created_at=str,
             credits=int,
             name=str,
             account_number=str,
@@ -15,25 +16,27 @@ class AccountManager:
             age=int,
             birth_date=str,
             phone_number=str,
-            transaction_history=list
+            transaction_history=list,
         )
-        self.user_model = Model(collection_name="users",
-                                schema=user_schema, db_instance=Database())
+        self.user_model = Model(
+            collection_name="users", schema=user_schema, db_instance=Database()
+        )
 
     # Function to add credits
     def add_credits(self, account_number, amount):
         user = self.user_model.find_one({"account_number": account_number})
         if user:
             new_credits = user["credits"] + amount
-            self.user_model.update({"account_number": account_number}, {
-                                   "credits": new_credits})
+            self.user_model.update(
+                {"account_number": account_number}, {"credits": new_credits}
+            )
             return new_credits
         return None
 
     # Function to generate password
     def generate_password(self):
         characters = string.ascii_uppercase + string.ascii_lowercase + string.digits
-        password = ''.join(random.choice(characters) for _ in range(5))
+        password = "".join(random.choice(characters) for _ in range(5))
         return password
 
     # Function to subtract credits
@@ -41,8 +44,9 @@ class AccountManager:
         user = self.user_model.find_one({"account_number": account_number})
         if user and user["credits"] >= amount:
             new_credits = user["credits"] - amount
-            self.user_model.update({"account_number": account_number}, {
-                                   "credits": new_credits})
+            self.user_model.update(
+                {"account_number": account_number}, {"credits": new_credits}
+            )
             return new_credits
         return None
 
@@ -57,7 +61,7 @@ class AccountManager:
             "password": self.generate_password(),
             "birth_date": birth_date,
             "phone_number": phone_number,
-            "transaction_history": []
+            "transaction_history": [],
         }
         new_account = self.user_model.create(account_data)
         return new_account
@@ -81,18 +85,21 @@ class AccountManager:
     def transfer_credits(self, sender_account_number, recipient_account_number, amount):
         sender_credits = self.subtract_credits(sender_account_number, amount)
         if sender_credits is not None:
-            recipient_credits = self.add_credits(
-                recipient_account_number, amount)
+            recipient_credits = self.add_credits(recipient_account_number, amount)
             if recipient_credits is not None:
                 sender = self.user_model.find_one(
-                    {"account_number": sender_account_number})
+                    {"account_number": sender_account_number}
+                )
                 recipient = self.user_model.find_one(
-                    {"account_number": recipient_account_number})
+                    {"account_number": recipient_account_number}
+                )
 
-                self._add_transaction(sender, "transfer",
-                                      amount, recipient_account_number)
                 self._add_transaction(
-                    recipient, "received", amount, sender_account_number)
+                    sender, "transfer", amount, recipient_account_number
+                )
+                self._add_transaction(
+                    recipient, "received", amount, sender_account_number
+                )
 
                 return f"Transferred {amount} from {sender_account_number} to {recipient_account_number}. New sender balance: {sender_credits}."
         return "Transfer failed: insufficient funds or account not found."
@@ -106,7 +113,7 @@ class AccountManager:
                 "birth_date": user["birth_date"],
                 "phone_number": user["phone_number"],
                 "credits": user["credits"],
-                "account_number": user["account_number"]
+                "account_number": user["account_number"],
             }
         return "Account not found."
 
@@ -131,8 +138,7 @@ class AccountManager:
     def edit_account_details(self, account_number, new_details):
         user = self.user_model.find_one({"account_number": account_number})
         if user:
-            self.user_model.update(
-                {"account_number": account_number}, new_details)
+            self.user_model.update({"account_number": account_number}, new_details)
             return "Account details updated."
         return "Account not found."
 
@@ -148,11 +154,13 @@ class AccountManager:
         transaction = {
             "type": trans_type,
             "amount": amount,
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
         if recipient_account_number:
             transaction["recipient"] = recipient_account_number
 
         updated_history = user["transaction_history"] + [transaction]
-        self.user_model.update({"account_number": user["account_number"]}, {
-                               "transaction_history": updated_history})
+        self.user_model.update(
+            {"account_number": user["account_number"]},
+            {"transaction_history": updated_history},
+        )
